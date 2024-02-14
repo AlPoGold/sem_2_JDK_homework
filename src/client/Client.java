@@ -66,4 +66,8 @@ public class Client implements ClientController, MessageListener {
 //
 
     }
+
+    public void disconnectTextField() {
+        clientWindow.tfMessage.setEditable(false);
+    }
 }

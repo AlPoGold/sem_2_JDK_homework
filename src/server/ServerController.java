@@ -27,7 +27,7 @@ public class ServerController implements ServerListener, MessageListener, Logger
     public void addNewUser(Client client) {
         if(isWorking){
                 clients.add(client);
-                message(client.getNameUser() + " is connected to the server!");
+                answerAll(client.getNameUser() + " is connected to the server!");
         }else throw new ServerException("server doesn't working!");
         }
 
@@ -63,8 +63,11 @@ public class ServerController implements ServerListener, MessageListener, Logger
             message("Server is stopped!");
             for (Client client: clients
                  ) {
-                client.disconnectFromServer();
+//                client.disconnectFromServer();
+                client.sendMessageFromServer(String.format("%s has been disconnected!",client.getNameUser()) );
+                client.disconnectTextField();
             }
+            clients.clear();
         }else sendMessageFromServer("Server was stopped already!");
 
 
@@ -88,9 +91,12 @@ public class ServerController implements ServerListener, MessageListener, Logger
             for (Client client : clients
             ) {
                 client.sendMessageFromServer(text);
+
             }
         }
         sendMessageFromServer(text);
+        writeLog(text);
+
 
     }
 
@@ -102,7 +108,11 @@ public class ServerController implements ServerListener, MessageListener, Logger
             while ((c = reader.read()) != -1){
                 stringBuilder.append((char) c);
             }
-            stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
+            try{
+                stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
+            }catch (StringIndexOutOfBoundsException e) {
+                return null;
+            }
             return stringBuilder.toString();
         } catch (Exception e){
             e.printStackTrace();
